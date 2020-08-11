@@ -12,6 +12,7 @@ const db = knex({
   });
 
 
+
 server.use(express.json());
 
 server.get('/', (req, res) => {
@@ -35,6 +36,54 @@ server.post('/', (req, res) => {
     .catch(err => {
         console.log(err)
     })
+})
+
+server.put('/:id', (req, res) => {
+    const id = req.params.id
+    const changes = req.body
+
+    db('cars')
+        .where({ id: id })
+        .update(changes)
+        .then(count => {
+            if (count) {
+                res.status(200).json({ message: "updated successfully" });
+            } else {
+                res.status(404).json({ message: "not found" });
+            }
+        })
+        .catch(error => {
+            console.log(error);
+
+            res.status(500).json({ error: error.message });
+        });
+})
+
+server.delete('/:id', (req, res) => {
+    const id = req.params.id
+    db('cars')
+        .where({ id: id })
+        .delete()
+        .then(count => {
+            if (count) {
+                res.status(200).json({ message: "removed successfully" });
+            } else {
+                res.status(404).json({ message: "not found" });
+            }
+        })
+        .catch(error => {
+            console.log(error);
+
+            res.status(500).json({ error: error.message });
+        });
+
+})
+
+server.get('/sales', (req, res) => {
+    db('sales')
+        .then(sales => {
+            res.status(200).json({ sales: sales})
+        })
 })
 
 module.exports = server;
